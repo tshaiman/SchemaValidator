@@ -1,0 +1,7 @@
+*.iml
+*.log
+.DS_Store
+.idea/
+target/
+workspace/
+project/target

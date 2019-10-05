@@ -1,0 +1,17 @@
+<configuration>
+
+    <appender name="CONSOLE_APPENDER" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d %green([%thread]) %highlight(%level) %logger{50} - %msg%n</pattern>
+        </layout>
+    </appender>
+
+    <logger name="org.apache.kafka" level="ERROR">
+        <appender-ref ref="CONSOLE_APPENDER" />
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE_APPENDER" />
+    </root>
+
+</configuration>
