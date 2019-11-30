@@ -1,8 +1,8 @@
-package training.transformer.schema
+package ts.training.transformer.schema
 
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient
 import org.apache.avro.Schema
-import training.transformer.configs.{ConfigSystem, KafkaConfig}
+import ts.training.transformer.configs.{ConfigSystem, KafkaConfig}
 
 
 object SchemaRepository
@@ -16,7 +16,7 @@ object SchemaRepository
     val metadata = client.getLatestSchemaMetadata(subject)
     val schema = new org.apache.avro.Schema.Parser().parse(metadata.getSchema)
     //register it to the cache
-    client.register(subject,schema)
+    client.register(subject, schema)
 
 
     schema

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ts.training</groupId>
-    <artifactId>transformer</artifactId>
+    <artifactId>SchemaValidator</artifactId>
     <version>1.0.0</version>
 
     <properties>
@@ -192,8 +192,6 @@
             <artifactId>avro</artifactId>
             <version>${avro.version}</version>
         </dependency>
-
-
 
         <dependency>
             <groupId>ch.qos.logback</groupId>

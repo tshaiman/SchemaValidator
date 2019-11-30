@@ -1,4 +1,4 @@
-package training.transformer.configs
+package ts.training.transformer.configs
 
 import com.typesafe.config.{Config, ConfigFactory}
 
@@ -10,20 +10,19 @@ trait ConfigSystem {
   val appSettings: Config = config.getConfig("transformer")
 
 
-
   def to_env_name(path: String): String = {
-    val replaced = path.replace("-","_")
-      .replace(".","_")
+    val replaced = path.replace("-", "_")
+      .replace(".", "_")
       .toUpperCase()
     s"$ServicePrefix$replaced"
   }
 
-  def configOrEnv(path:String):String ={
-    Try{
+  def configOrEnv(path: String): String = {
+    Try {
       config.getString(path)
     } match {
       case Success(value) => value
-      case Failure(_) => sys.env.getOrElse(to_env_name(path),"")
+      case Failure(_) => sys.env.getOrElse(to_env_name(path), "")
     }
   }
 }

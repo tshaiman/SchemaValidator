@@ -1,10 +1,9 @@
-package training.transformer.configs
+package ts.training.transformer.configs
 
 import java.util.Properties
 
 import com.typesafe.config.Config
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig
-import io.confluent.kafka.serializers.subject.RecordNameStrategy
 import io.confluent.kafka.streams.serdes.avro.GenericAvroSerde
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerConfig
@@ -23,21 +22,16 @@ trait KafkaConfig extends ConfigSystem {
   val schemaUrl: String = configOrEnv("kafka.schema.registry.url")
 
   val producerConfig: Config = kafkaConfig.getConfig("producer")
-  val producerBufferMemoryBytes: String = producerConfig.getString("buffer.memory")
   val producerCompressionType: String = producerConfig.getString("compression.type")
   val producerBatchSize: String = producerConfig.getString("batch.size")
   val enableIdempotence: String = producerConfig.getString("enable.idempotence")
   val lingerMs: String = producerConfig.getString("linger.ms")
+  val producerMaxRequestSize: String = producerConfig.getString("max.request.size")
 
 
   val consumerConfig: Config = kafkaConfig.getConfig("consumer")
-  val consumerPollTimeoutMs: Long = consumerConfig.getLong("poll-timeout-ms")
-  val consumerEnableAutoCommit: String = consumerConfig.getString("enable.auto.commit")
-  val consumerAutoOffsetReset: String = consumerConfig.getString("auto.offset.reset")
-  val consumerMetadataMaxAgeMs: String = consumerConfig.getString("metadata.max.age.ms")
-  val consumerFetchMaxWaitMs: String = consumerConfig.getString("fetch.max.wait.ms")
   val consumerMaxPollRecords: String = consumerConfig.getString("max.poll.records")
-  val consumerMaxPartitionFetchBytes: String = consumerConfig.getString("max.partition.fetch.bytes")
+  val consumerFetchMaxBytes: String = consumerConfig.getString("fetch.max.bytes")
 
 
 }
@@ -52,29 +46,25 @@ object KafkaProperties extends KafkaConfig {
     streamsConfiguration.put(StreamsConfig.CLIENT_ID_CONFIG, clientId)
     streamsConfiguration.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaUrl)
     streamsConfiguration.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, classOf[GenericAvroSerde])
-    streamsConfiguration.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.ByteArray.getClass.getName)
+    streamsConfiguration.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String.getClass.getName)
     streamsConfiguration.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, (5 * 1000).asInstanceOf[java.lang.Integer])
-    streamsConfiguration.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
     streamsConfiguration.put(StreamsConfig.CACHE_MAX_BYTES_BUFFERING_CONFIG, 0.asInstanceOf[java.lang.Integer])
     streamsConfiguration.put(AbstractKafkaAvroSerDeConfig.AUTO_REGISTER_SCHEMAS, "false")
-    streamsConfiguration.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, "exactly_once")
+    streamsConfiguration.put(StreamsConfig.NUM_STREAM_THREADS_CONFIG, "1")
+    streamsConfiguration.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, StreamsConfig.EXACTLY_ONCE)
 
-    mergeProducerConsumerProps(streamsConfiguration)
+    //Consumer  dedicated Configs
+    streamsConfiguration.put(StreamsConfig.consumerPrefix(ConsumerConfig.MAX_POLL_RECORDS_CONFIG), consumerMaxPollRecords)
+    streamsConfiguration.put(StreamsConfig.consumerPrefix(ConsumerConfig.FETCH_MAX_BYTES_CONFIG), consumerFetchMaxBytes)
+
+    //Producer dedicated Configs
+    streamsConfiguration.put(StreamsConfig.producerPrefix(ProducerConfig.COMPRESSION_TYPE_CONFIG), producerCompressionType)
+    streamsConfiguration.put(StreamsConfig.producerPrefix(ProducerConfig.MAX_REQUEST_SIZE_CONFIG), producerMaxRequestSize)
+    streamsConfiguration.put(StreamsConfig.producerPrefix(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG), enableIdempotence)
+    streamsConfiguration.put(StreamsConfig.producerPrefix(ProducerConfig.BATCH_SIZE_CONFIG), producerBatchSize)
+    streamsConfiguration.put(StreamsConfig.producerPrefix(ProducerConfig.LINGER_MS_CONFIG), lingerMs)
+
     streamsConfiguration
-  }
-
-  private def mergeProducerConsumerProps(props: Properties): Properties = {
-    props.put(ProducerConfig.BUFFER_MEMORY_CONFIG, producerBufferMemoryBytes)
-    props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, producerCompressionType)
-    props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, enableIdempotence)
-    props.put(ProducerConfig.BATCH_SIZE_CONFIG, producerBatchSize)
-    props.put(ProducerConfig.LINGER_MS_CONFIG, lingerMs)
-
-
-    props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, consumerEnableAutoCommit)
-    props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, consumerMaxPollRecords)
-    props.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, consumerFetchMaxWaitMs)
-    props
   }
 
 
