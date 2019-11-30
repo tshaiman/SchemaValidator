@@ -1,4 +1,4 @@
-package ts.training.transformer.configs
+package training.transformer.configs
 
 import java.util.Properties
 

@@ -1,11 +1,8 @@
-package ts.training.transformer.schema
-
-import java.util.concurrent.TimeUnit
-
+package training.transformer.schema
 
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient
 import org.apache.avro.Schema
-import ts.training.transformer.configs.{ConfigSystem, KafkaConfig}
+import training.transformer.configs.{ConfigSystem, KafkaConfig}
 
 
 object SchemaRepository

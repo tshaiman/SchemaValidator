@@ -1,4 +1,4 @@
-package ts.training.transformer
+package training.transformer
 
 import java.time.Duration
 
@@ -8,34 +8,41 @@ import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.kstream._
 import org.apache.kafka.streams.{KafkaStreams, StreamsBuilder}
 import org.slf4j.LoggerFactory
+import training.transformer.configs.{ConfigSystem, KafkaConfig, KafkaProperties}
+import training.transformer.schema.SchemaRepository
 import ts.training.transformer.configs.{ConfigSystem, KafkaConfig, KafkaProperties}
-import ts.training.transformer.schema.SchemaRepository
 
 import scala.util.{Failure, Success, Try}
 
-//scripts
-/*Create new topic for raw data
-bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic products-avro --replication-factor 1 --partitions 1
-bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic products-raw --replication-factor 1 --partitions 1
-*/
+/*
+--Download Landoop Fast-data-dev image
 
-  /* Producer some raw json data
-kafkacat -P -b 0 -t products-raw
-==and then use the following inpt
+$ docker run --rm -p 2181:2181 -p 3030:3030 -p 8081-8083:8081-8083 \
+-p 9581-9585:9581-9585 -p 9092:9092 -e ADV_HOST=127.0.0.1 \
+landoop/fast-data-dev:latest
+
+
+-- Create new topic for raw data
+$ bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic products-avro --replication-factor 1 --partitions 1
+$ bin/kafka-topics.sh --zookeeper localhost:2181 --create --topic products-raw --replication-factor 1 --partitions 1
+
+-- Producer some raw json data
+$ kafkacat -P -b 0 -t products-raw
+==and then use the following input
+
 {"name":"Floor Lamp","catalogNr":"503.237.62","description":"a bamboo standing lamp","price":49.99},
 {"name":"Baby Blanket","catalogNr":"804.271.12","description":"Soft Snag blanket","price":12.99},
 {"name":"Room Curtains","catalogNr":"604.189.05","description":"Room darkening curtains prevent most light from entering","price":59.12}
-*/
 
-/*Create new Schema
+
+-- Create new Schema
 curl -X POST -H 'Content-Type:application/vnd.schemaregistry.v1+json'  \
 --data '{"schema":"{\"type\":\"record\",\"name\":\"products\",\"namespace\":\"ts.com.training\",\"fields\":[{\"name\":\"name\",\"type\":\"string\"}, {\"name\":\"catalogNr\",\"type\":\"string\"},{\"name\":\"description\",\"type\":\"string\"},{\"name\":\"price\",\"type\":\"float\"}]}"}'  \
-http://localhost:8081/subjects/products-avro-value2/versions
-*/
+http://localhost:8081/subjects/products-avro-value/versions
 
+-- check the output topic using avro tools
 
-/*check the output topic using avro tools
-kafka-avro-console-consumer --bootstrap-server localhost:9092 \                                                                                                                                                 19:32  
+$ kafka-avro-console-consumer --bootstrap-server localhost:9092 \                                                                                                                                                 19:32  
 --property schema.registry.url=http://localhost:8081 \
 --topic products-avro  \
 --from-beginning  | \

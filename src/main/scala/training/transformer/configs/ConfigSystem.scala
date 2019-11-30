@@ -1,4 +1,4 @@
-package ts.training.transformer.configs
+package training.transformer.configs
 
 import com.typesafe.config.{Config, ConfigFactory}
 
@@ -7,9 +7,9 @@ import scala.util.{Failure, Success, Try}
 trait ConfigSystem {
   implicit val config: Config = ConfigFactory.load()
   val ServicePrefix = "CV_"
-  val appSettings: Config = config.getConfig("collection-validator")
-  val reportMetrics: Boolean = appSettings.getBoolean("report-metrics")
-  val metricsPort:Int = appSettings.getInt("metrics-port")
+  val appSettings: Config = config.getConfig("transformer")
+
+
 
   def to_env_name(path: String): String = {
     val replaced = path.replace("-","_")
