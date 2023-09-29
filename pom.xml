@@ -16,7 +16,7 @@
         <monitoring.version>1.0.4</monitoring.version>
         <kafka.version>5.3.1-ccs</kafka.version>
         <confluence.version>5.3.1</confluence.version>
-        <avro.version>1.9.0.12p</avro.version>
+        <avro.version>1.11.3</avro.version>
 
         <mainClass>ts.training.transformer.TrasnformerApp</mainClass>
 
